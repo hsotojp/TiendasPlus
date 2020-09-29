@@ -1,0 +1,21 @@
+server:
+  port: 8088
+
+spring:
+  application:
+    name: tiendasplus
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/dbtiendasplus
+    username: postgres
+    password: 1234
+
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+    naming:
+      physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
