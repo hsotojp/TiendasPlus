@@ -35,7 +35,6 @@ public class EmpleadoCotroller {
     @DeleteMapping("/{id}")
     public String deleteEmpleadoId(@PathVariable int id){
 
-        //Tienda t = empleado.findById(id).orElseThrow(()-> new IllegalArgumentException( "No se encontraron registros."));
 
         empleado.deleteById(id);
 
@@ -47,10 +46,10 @@ public class EmpleadoCotroller {
     public Empleado updateEmpleado(@PathVariable int id, @RequestBody Empleado newEmpleado){
         Empleado t = empleado.findById(id).orElseThrow(()-> new IllegalArgumentException( "No se encontraron registros."));
 
-        t.setNombre(newTienda.getNombre());
-		t.setApellido(newTienda.getApellido());
-		t.setUsuario(newTienda.getUsuario());
-        t.setContrasenia(newTienda.getContrasenia());
+        t.setNombre(newEmpleado.getNombre());
+		t.setApellido(newEmpleado.getApellido());
+		t.setUsuario(newEmpleado.getUsuario());
+        t.setContrasenia(newEmpleado.getContrasenia());
 
 
         empleado.save(t);

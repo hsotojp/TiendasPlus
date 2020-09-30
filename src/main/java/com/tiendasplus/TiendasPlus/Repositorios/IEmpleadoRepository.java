@@ -5,6 +5,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ITiendaRepository extends CrudRepository<Empleado, Integer> {
+public interface IEmpleadoRepository extends CrudRepository<Empleado, Integer> {
 
+    Empleado findByUsuarioAndContrasenia(String user, String pass);
 }
