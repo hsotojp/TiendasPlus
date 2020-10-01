@@ -3,12 +3,13 @@ package com.tiendasplus.TiendasPlus.Controladores;
 import com.tiendasplus.TiendasPlus.Entidades.Tienda;
 import com.tiendasplus.TiendasPlus.Repositorios.ITiendaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/tienda")
+@RequestMapping(path = "tienda", produces = MediaType.APPLICATION_JSON_VALUE)
 public class TiendaCotroller {
     @Autowired
     ITiendaRepository tienda;
