@@ -21,9 +21,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.cors().and().csrf().disable();
         http.authorizeRequests()
-                //.mvcMatchers("/*").permitAll()
-                .antMatchers("/tienda/all").authenticated()
-                .antMatchers("/login/test").authenticated()
+                .antMatchers("Login/login").permitAll()
+                .antMatchers("/tienda/*").authenticated()
+                .antMatchers("/producto/*").authenticated()
+                .antMatchers("/empleado/*").authenticated()
+                .antMatchers("/inventario/*").authenticated()
                 .and()
                 .oauth2ResourceServer().jwt();
 
