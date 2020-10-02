@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+	<!-- jQuery Modal -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventario</title>
+    <script>
+		/*FUNCION PARA LISTAR TODOS LOS ELEMENTOS DE LA TABLA*/
+		$(document).ready(function() {
+			$.getJSON('http://localhost:8088/inventario/all', function(json) {
+				var tr=[];
+				for (var i = 0; i < json.length; i++) {
+					tr.push('<tr>');
+					tr.push('<td>' + json[i].idregistro + '</td>');
+					tr.push('<td>' + json[i].cantidad + '</td>');
+                    tr.push('<td>'+ json[i].idproducto + '</td>');
+                    tr.push('<td>' + json[i].idtienda + '</td>');
+					tr.push('<td><button class=\'edit\'>Edit</button>&nbsp;&nbsp;<button class=\'delete\' id=' + json[i].idregistro + ' >Delete</button></td>');
+					tr.push('</tr>');
+				}
+                $('table').append($(tr.join('')));
+            });
+            /*FUNCION ELIMINAR*/
+            $(document).delegate('.delete', 'click', function() { 
+				if (confirm('¿Esta seguro de eliminar este registro?')) {
+					var id = $(this).attr('id');
+					var parent = $(this).parent().parent();
+					$.ajax({
+						type: "DELETE",
+						url: "http://localhost:8088/inventario/" + id,
+						cache: false,
+						success: function() {
+							parent.fadeOut('slow', function() {
+								$(this).remove();
+							});
+							location.reload(true)
+						},
+						error: function() {
+							$('#err').html('<span style=\'color:red; font-weight: bold; font-size: 30px;\'>Error deleting record').fadeIn().fadeOut(4000, function() {
+								$(this).remove();
+							});
+						}
+					});
+				}
+			});
+			/*FUNCION PARA AGREGAR DATOS*/
+			$(document).delegate('#addNew', 'click', function(event) {
+				event.preventDefault();
+				
+				var cantidad = $('#cantidad').val();
+				var producto = $('#producto').val();
+				var tienda = $('#tienda').val();
+				
+				$.ajax({
+					type: "POST",
+					contentType: "application/json; charset=utf-8",
+					url: "http://localhost:8088/inventario/add",
+					data: JSON.stringify({'cantidad':cantidad,'idproducto':producto,'idtienda':tienda}),
+					cache: false,
+					success: function(result) {
+						$("#msg").html( "<span style='color: green'>Datos agregados correctamente</span>" );
+						window.setTimeout(function(){location.reload()},1000)
+					},
+					error: function(err) {
+						$("#msg").html( "<span style='color: red'>No se han guardado datos</span>" );
+					}
+				});
+			});
+			/*FUNCION PARA EDITAR*/
+			$(document).delegate('.edit', 'click', function() {
+				var parent = $(this).parent().parent();
+				
+				var id = parent.children("td:nth-child(1)");
+				var cantidad = parent.children("td:nth-child(2)");
+				var producto = parent.children("td:nth-child(3)");
+				var tienda = parent.children("td:nth-child(4)");
+				var buttons = parent.children("td:nth-child(5)");
+				
+				cantidad.html("<input type='text' id='txtCantidad' value='" + cantidad.html() + "'/>");
+				producto.html("<input type='text' id='txtProducto' value='" + producto.html() + "'/>");
+				tienda.html("<input type='text' id='txtTienda' value='" + tienda.html() + "'/>");
+				buttons.html("<button id='save'>Save</button>&nbsp;&nbsp;<button class='delete' id='" + id.html() + "'>Delete</button>");
+			});
+			$(document).delegate('#save', 'click', function() {
+				var parent = $(this).parent().parent();
+				
+				var id = parent.children("td:nth-child(1)");
+				var cantidad = parent.children("td:nth-child(2)");
+				var producto = parent.children("td:nth-child(3)");
+				var tienda = parent.children("td:nth-child(4)");
+				var buttons = parent.children("td:nth-child(5)");
+				
+				$.ajax({
+					type: "POST",
+					contentType: "application/json; charset=utf-8",
+					url: "http://localhost:8088/inventario/add",
+					data: JSON.stringify({'idregistro' : id.html(), 'cantidad' : cantidad.children("input[type=text]").val(),
+					'idproducto':producto.children("input[type=text]").val(),
+					'idtienda':tienda.children("input[type=text]").val()
+					}),
+					cache: false,
+					success: function() {
+						cantidad.html(cantidad.children("input[type=text]").val());
+						producto.html(producto.children("input[type=text]").val());
+						tienda.html(tienda.children("input[type=text]").val());
+						buttons.html("<button class='edit' id='" + id.html() + "'>Edit</button>&nbsp;&nbsp;<button class='delete' id='" + id.html() + "'>Delete</button>");
+					},
+					error: function() {
+						$('#err').html('<span style=\'color:red; font-weight: bold; font-size: 30px;\'>Error updating record').fadeIn().fadeOut(4000, function() {
+							$(this).remove();
+						});
+					}
+				});
+			});
+		});
+    </script>
+</head>
+<body>
+	<div class="container">
+		<h2>Inventario</h2>
+		<p><a class='btn' href="#add" rel="modal:open">Ingresar datos</a></p>
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Registro</th>
+					<th>Cantidad</th>
+					<th>Id Producto</th>
+					<th>Id Tienda</th>
+				</tr>
+			</thead>
+		</table>
+	</div>
+	
+	<form id="add" action="#" class="add_form modal" style="display:none;" name="form">
+		<div id='msg'/>
+		<h3>Ingresar datos</h3>
+		<p>
+			<label>Cantidad</label>
+			<input type="text" id="cantidad" name="cantidad">
+			<label>Id Producto</label>
+			<input type="text" id="producto" name="producto">
+			<label>Id Tienda</label>
+			<input type="text" id="tienda" name="tienda">
+		</p>
+		<p>
+			<input type="submit" id="addNew" value="Guardar">
+		</p>
+	</form>
+</body>
+</html>
