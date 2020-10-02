@@ -26,6 +26,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/producto/*").authenticated()
                 .antMatchers("/empleado/*").authenticated()
                 .antMatchers("/inventario/*").authenticated()
+                .antMatchers("/ingreso/*").authenticated()
                 .and()
                 .oauth2ResourceServer().jwt();
 
