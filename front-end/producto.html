@@ -8,26 +8,25 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ingreso</title>
+    <title>Producto</title>
     <script>
 		/*FUNCION PARA LISTAR TODOS LOS ELEMENTOS DE LA TABLA*/
 		$(document).ready(function() {
 		
 			$.ajax({
 				method: "GET",
-                url: 'http://localhost:8088/ingreso/all',
+                url: 'http://localhost:8088/producto/all',
 				headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
 				success: function(json){
 					var tr=[];
 					for (var i = 0; i < json.length; i++) {
 						tr.push('<tr>');
-						tr.push('<td>' + json[i].idingreso + '</td>');
-						tr.push('<td>' + json[i].fecha + '</td>');
-						tr.push('<td>' + json[i].cantidad + '</td>');
 						tr.push('<td>' + json[i].idproducto + '</td>');
 						tr.push('<td>' + json[i].idempleado + '</td>');
+						tr.push('<td>' + json[i].descripcion + '</td>');
+						tr.push('<td>' + json[i].precio + '</td>');
 						
-						tr.push('<td><button class=\'edit\'>Edit</button>&nbsp;&nbsp;<button class=\'delete\' id=' + json[i].idingreso + ' >Delete</button></td>');
+						tr.push('<td><button class=\'edit\'>Edit</button>&nbsp;&nbsp;<button class=\'delete\' id=' + json[i].idproducto + ' >Delete</button></td>');
 						tr.push('</tr>');
 					}
 					$('table').append($(tr.join('')));
@@ -62,9 +61,11 @@
 			$(document).delegate('#addNew', 'click', function(event) {
 				event.preventDefault();
 				
-				var idempleado = $('#empleado').val();
-				var idproducto = $('#producto').val();
-				var cantidad = $('#cantidad').val();
+				
+				var idproducto = $('#idproducto').val();
+				var idempleado = $('#idempleado').val();
+				var descripcion = $('#descripcion').val();
+				var precio = $('#precio').val();
 				
 					
 				$.ajax({
@@ -72,7 +73,7 @@
 					contentType: "application/json; charset=utf-8",
 					url: "http://localhost:8088/ingreso/add",
 					headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
-					data: JSON.stringify({'cantidad':cantidad,'idproducto':idproducto,'idempleado':idempleado}),
+					data: JSON.stringify({'precio':precio,'idproducto':idproducto,'idempleado':idempleado,'descripcion':descripcion}),
 					cache: false,
 					success: function(result) {
 						$("#msg").html( "<span style='color: green'>Datos agregados correctamente</span>" );
@@ -88,23 +89,26 @@
 				var parent = $(this).parent().parent();
 				
 				var id = parent.children("td:nth-child(1)");
-				var cantidad = parent.children("td:nth-child(3)");
-				var producto = parent.children("td:nth-child(4)");
-				var idempleado = parent.children("td:nth-child(5)");
+				var idproducto = parent.children("td:nth-child(2)");
+				var idempleado = parent.children("td:nth-child(3)");
+				var descripcion = parent.children("td:nth-child(4)");
+				var precio = parent.children("td:nth-child(5)");
 				var buttons = parent.children("td:nth-child(6)");
 				
-				cantidad.html("<input type='text' id='txtCantidad' value='" + cantidad.html() + "'/>");
-				producto.html("<input type='text' id='txtProducto' value='" + producto.html() + "'/>");
+				idproducto.html("<input type='text' id='txtProducto' value='" + idproducto.html() + "'/>");
 				idempleado.html("<input type='text' id='txtEmpleado' value='" + idempleado.html() + "'/>");
+				descripcion.html("<input type='text' id='txtDescripcion' value='" + descripcion.html() + "'/>");
+				precio.html("<input type='text' id='txtPrecio' value='" + precio.html() + "'/>");
 				buttons.html("<button id='save'>Save</button>&nbsp;&nbsp;<button class='delete' id='" + id.html() + "'>Delete</button>");
 			});
 			$(document).delegate('#save', 'click', function() {
 				var parent = $(this).parent().parent();
 				
 				var id = parent.children("td:nth-child(1)");
-				var cantidad = parent.children("td:nth-child(3)");
-				var producto = parent.children("td:nth-child(4)");
-				var idempleado = parent.children("td:nth-child(5)");
+				var idproducto = parent.children("td:nth-child(2)");
+				var idempleado = parent.children("td:nth-child(3)");
+				var descripcion = parent.children("td:nth-child(4)");
+				var precio = parent.children("td:nth-child(5)");
 				var buttons = parent.children("td:nth-child(6)");
 				
 				$.ajax({
@@ -112,16 +116,17 @@
 					contentType: "application/json; charset=utf-8",
 					url: "http://localhost:8088/ingreso/add",
 					headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
-					data: JSON.stringify({'idingreso' : id.html(), 'cantidad' : cantidad.children("input[type=text]").val(),
-					'idproducto':producto.children("input[type=text]").val(),
-					'idempleado':idempleado.children("input[type=text]").val()
+					data: JSON.stringify({'idproducto' : idproducto.html(), 'idempleado' : idempleado.children("input[type=text]").val(),
+					'descripcion':descripcion.children("input[type=text]").val(),
+					'precio':precio.children("input[type=text]").val()
 					}),
 					cache: false,
 					success: function() {
-						cantidad.html(cantidad.children("input[type=text]").val());
-						producto.html(producto.children("input[type=text]").val());
+						idproducto.html(idproducto.children("input[type=text]").val());
 						idempleado.html(idempleado.children("input[type=text]").val());
-						buttons.html("<button class='edit' id='" + id.html() + "'>Edit</button>&nbsp;&nbsp;<button class='delete' id='" + id.html() + "'>Delete</button>");
+						descripcion.html(descripcion.children("input[type=text]").val());
+						precio.html(precio.children("input[type=text]").val());
+						buttons.html("<button class='edit' id='" + id.html() + "'>Edit</button>&nbsp;&nbsp;<button class='delete' id='" + idproducto.html() + "'>Delete</button>");
 					},
 					error: function() {
 						$('#err').html('<span style=\'color:red; font-weight: bold; font-size: 30px;\'>Error updating record').fadeIn().fadeOut(4000, function() {
@@ -135,16 +140,16 @@
 </head>
 <body>
 	<div class="container">
-		<h2>Ingreso</h2>
+		<h2>Producto</h2>
 		<p><a class='btn' href="#add" rel="modal:open">Ingresar datos</a></p>
 		<table class="table">
 			<thead>
 				<tr>
-					<th>Ingreso</th>
-					<th>Fecha</th>
-					<th>Cantidad</th>
-					<th>Id Producto</th>
-					<th>Id Empleado</th>
+					<th>Código Producto</th>
+					<th>Código Empleado</th>
+					<th>Descripción</th>
+					<th>Precio</th>
+					
 				</tr>
 			</thead>
 		</table>
@@ -154,14 +159,17 @@
 		<div id='msg'/>
 		<h3>Ingresar datos</h3>
 		
-			<label>Cantidad</label>
-			<input type="text" id="cantidad" name="cantidad">
+			<label>Código Producto</label>
+			<input type="text" id="idproducto" name="idproducto">
 			<p>
-			<label>Id Producto</label>
-			<input type="text" id="producto" name="producto">
+			<label>Código Empleado</label>
+			<input type="text" id="idempleado" name="idempleado">
 			<p>
-			<label>Id Empleado</label>
-			<input type="text" id="empleado" name="empleado">
+			<label>Descripción</label>
+			<input type="text" id="descripcion" name="descripcion">
+			<p>
+			<label>Precio</label>
+			<input type="text" id="precio" name="precio">
 		<p>
 			<input type="submit" id="addNew" value="Guardar">
 		</p>
