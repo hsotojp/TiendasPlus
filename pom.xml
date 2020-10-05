@@ -108,11 +108,11 @@
 	  <artifactId>org.eclipse.persistence.oracle</artifactId>
 	  <version>2.6.1-RC1</version>
 	 </dependency>
-	 <dependency>
+	 <!--<dependency>
 	  <groupId>unknown.binary</groupId>
 	  <artifactId>javax.persistence</artifactId>
 	  <version>SNAPSHOT</version>
-	 </dependency>
+	 </dependency>-->
 	<dependency>
 		<groupId>com.mashape.unirest</groupId>
 		<artifactId>unirest-java</artifactId>
@@ -124,6 +124,9 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<finalName>TiendaPlus</finalName>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

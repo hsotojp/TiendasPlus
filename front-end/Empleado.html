@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<link rel="stylesheet" href="index_style.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+	<!-- jQuery Modal -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Empleado</title>
+    <script>
+		/*FUNCION PARA LISTAR TODOS LOS ELEMENTOS DE LA TABLA*/
+		$(document).ready(function() {
+		
+			$.ajax({
+				method: "GET",
+                url: 'http://localhost:8088/empleado/all',
+				headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
+				success: function(json){
+					var tr=[];
+					for (var i = 0; i < json.length; i++) {
+						tr.push('<tr>');
+						tr.push('<td>' + json[i].idempleado + '</td>');
+						tr.push('<td>' + json[i].nombre + '</td>');
+						tr.push('<td>'+ json[i].apellido + '</td>');
+						tr.push('<td>' + json[i].usuario + '</td>');
+						tr.push('<td>' + json[i].idtienda + '</td>');
+						tr.push('<td><button class=\'edit\'>Edit</button>&nbsp;&nbsp;<button class=\'delete\' id=' + json[i].idregistro + ' >Delete</button></td>');
+						tr.push('</tr>');
+					}
+					$('table').append($(tr.join('')));
+				
+				}
+			});
+            /*FUNCION ELIMINAR*/
+            $(document).delegate('.delete', 'click', function() { 
+				if (confirm('¿Esta seguro de eliminar este registro?')) {
+					var id = $(this).attr('id');
+					var parent = $(this).parent().parent();
+					$.ajax({
+						type: "DELETE",
+						url: "http://localhost:8088/empleado/" + id,
+						headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
+						cache: false,
+						success: function() {
+							parent.fadeOut('slow', function() {
+								$(this).remove();
+							});
+							location.reload(true)
+						},
+						error: function() {
+							$('#err').html('<span style=\'color:red; font-weight: bold; font-size: 30px;\'>Error deleting record').fadeIn().fadeOut(4000, function() {
+								$(this).remove();
+							});
+						}
+					});
+				}
+			});
+			/*FUNCION PARA AGREGAR DATOS*/
+			$(document).delegate('#addNew', 'click', function(event) {
+				event.preventDefault();
+				
+				var nombre = $('#nombre').val();
+				var apellido = $('#apellido').val();
+				var tienda = $('#tienda').val();
+				var usuario = $('#usuario').val();
+				var contrasenia = $('#contrasenia').val();
+				
+				$.ajax({
+					type: "POST",
+					contentType: "application/json; charset=utf-8",
+					url: "http://localhost:8088/empleado/add",
+					headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
+					data: JSON.stringify({'nombre':nombre,'apellido':apellido,'idtienda':tienda, 'usuario': usuario, 'contrasenia': contrasenia}),
+					cache: false,
+					success: function(result) {
+						$("#msg").html( "<span style='color: green'>Datos agregados correctamente</span>" );
+						window.setTimeout(function(){location.reload()},1000)
+					},
+					error: function(err) {
+						$("#msg").html( "<span style='color: red'>No se han guardado datos</span>" );
+					}
+				});
+			});
+			/*FUNCION PARA EDITAR*/
+			$(document).delegate('.edit', 'click', function() {
+				var parent = $(this).parent().parent();
+				
+				var id = parent.children("td:nth-child(1)");
+				var nombre = parent.children("td:nth-child(2)");
+				var apellido = parent.children("td:nth-child(3)");
+				var usuario = parent.children("td:nth-child(4)");
+				var tienda = parent.children("td:nth-child(5)");
+				var buttons = parent.children("td:nth-child(6)");
+				
+				nombre.html("<input type='text' id='txtnombre' value='" + nombre.html() + "'/>");
+				apellido.html("<input type='text' id='txtApellido' value='" + apellido.html() + "'/>");
+				usuario.html("<input type='text' id='txtUsuario' value='" + usuario.html() + "'/>");
+				tienda.html("<input type='text' id='txtTienda' value='" + tienda.html() + "'/>");
+				buttons.html("<button id='save'>Save</button>&nbsp;&nbsp;<button class='delete' id='" + id.html() + "'>Delete</button>");
+			});
+			$(document).delegate('#save', 'click', function() {
+				var parent = $(this).parent().parent();
+				
+				var id = parent.children("td:nth-child(1)");
+				var nombre = parent.children("td:nth-child(2)");
+				var apellido = parent.children("td:nth-child(3)");
+				var usuario = parent.children("td:nth-child(4)");
+				var tienda = parent.children("td:nth-child(5)");
+				var buttons = parent.children("td:nth-child(6)");
+				
+				$.ajax({
+					type: "POST",
+					contentType: "application/json; charset=utf-8",
+					url: "http://localhost:8088/empleado/add",
+					headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
+					data: JSON.stringify({'idempleado' : id.html(), 'nombre' : nombre.children("input[type=text]").val(),
+					'apellido':apellido.children("input[type=text]").val(),
+					'usuario':usuario.children("input[type=text]").val(),
+					'idtienda': tienda.children("input[type=text]").val()
+					}),
+					cache: false,
+					success: function() {
+						nombre.html(nombre.children("input[type=text]").val());
+						apellido.html(apellido.children("input[type=text]").val());
+						usuario.html(usuario.children("input[type=text]").val());
+						tienda.html(tienda.children("input[type=text]").val());
+						buttons.html("<button class='edit' id='" + id.html() + "'>Edit</button>&nbsp;&nbsp;<button class='delete' id='" + id.html() + "'>Delete</button>");
+					},
+					error: function() {
+						$('#err').html('<span style=\'color:red; font-weight: bold; font-size: 30px;\'>Error updating record').fadeIn().fadeOut(4000, function() {
+							$(this).remove();
+						});
+					}
+				});
+			});
+		});
+    </script>
+</head>
+<body>
+
+	<nav class="navbar navbar-expand-lg navbar-light bg-light">
+	  <img style="max-width: 7%;border-radius: 100%;" src="tienda_logo.jpg">
+	  <div class="collapse navbar-collapse" id="navbarNav">
+		<ul class="navbar-nav">
+		  <li class="nav-item">
+			<a class="nav-link" href="index.html" style="font-size:20px">Home</a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" href="#" style="font-size:20px">Tiendas</a>
+		  </li>
+		  <li class="nav-item active" >
+			<a class="nav-link" href="Empleado.html" style="font-size:20px">Empleados</a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" href="#" style="font-size:20px">Productos</a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" href="inventario.html" style="font-size:20px">Inventario <span class="sr-only">(current)</span></a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" href="#" style="font-size:20px">Ingresos</a>
+		  </li>
+		</ul>
+	  </div>
+	</nav>	
+	<div class="container">
+		<h2>Empleado</h2>
+		<p><a class='btn' href="#add" rel="modal:open">Ingresar datos</a></p>
+		<table class="table">
+			<thead>
+				<tr>
+				    <th>No. Empleado</th>
+					<th>Nombre</th>
+					<th>Apellido</th>
+					<th>Usuario</th>
+					<th>Id Tienda</th>
+				</tr>
+			</thead>
+		</table>
+	</div>
+	
+	<form id="add" action="#" class="add_form modal" style="display:none;" name="form">
+		<div id='msg'/>
+		<h3>Ingresar datos</h3>
+		
+			<label>Nombre</label>
+			<input type="text" id="nombre" name="nombre">
+			<p>
+			<label>Apellido</label>
+			<input type="text" id="apellido" name="apellido">
+			<p>
+			<label>Id Tienda</label>
+			<input type="text" id="tienda" name="tienda">
+			<p>
+			<label>Usuario</label>
+			<input type="text" id="usuario" name="usuario">
+			<p>
+			<label>Contraseña</label>
+			<input type="text" id="contrasenia" name="contrasenia">
+		<p>
+			<input type="submit" id="addNew" value="Guardar">
+		</p>
+	</form>
+</body>
+</html>
