@@ -24,7 +24,7 @@
 					for (var i = 0; i < json.length; i++) {
 						tr.push('<tr>');
 						tr.push('<td>' + json[i].idproducto + '</td>');
-						tr.push('<td>' + json[i].idempleado + '</td>');
+						tr.push('<td>' + json[i].nombre + '</td>');
 						tr.push('<td>' + json[i].descripcion + '</td>');
 						tr.push('<td>' + json[i].precio + '</td>');
 						
@@ -65,7 +65,7 @@
 				
 				
 				var idproducto = $('#idproducto').val();
-				var idempleado = $('#idempleado').val();
+				var nombre = $('#nombre').val();
 				var descripcion = $('#descripcion').val();
 				var precio = $('#precio').val();
 				
@@ -75,7 +75,7 @@
 					contentType: "application/json; charset=utf-8",
 					url: "http://localhost:8088/ingreso/add",
 					headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
-					data: JSON.stringify({'precio':precio,'idproducto':idproducto,'idempleado':idempleado,'descripcion':descripcion}),
+					data: JSON.stringify({'precio':precio,'idproducto':idproducto,'nombre':nombre,'descripcion':descripcion}),
 					cache: false,
 					success: function(result) {
 						$("#msg").html( "<span style='color: green'>Datos agregados correctamente</span>" );
@@ -92,13 +92,13 @@
 				
 				var id = parent.children("td:nth-child(1)");
 				var idproducto = parent.children("td:nth-child(2)");
-				var idempleado = parent.children("td:nth-child(3)");
+				var nombre = parent.children("td:nth-child(3)");
 				var descripcion = parent.children("td:nth-child(4)");
 				var precio = parent.children("td:nth-child(5)");
 				var buttons = parent.children("td:nth-child(6)");
 				
 				idproducto.html("<input type='text' id='txtProducto' value='" + idproducto.html() + "'/>");
-				idempleado.html("<input type='text' id='txtEmpleado' value='" + idempleado.html() + "'/>");
+				nombre.html("<input type='text' id='txtEmpleado' value='" + nombre.html() + "'/>");
 				descripcion.html("<input type='text' id='txtDescripcion' value='" + descripcion.html() + "'/>");
 				precio.html("<input type='text' id='txtPrecio' value='" + precio.html() + "'/>");
 				buttons.html("<button id='save'>Save</button>&nbsp;&nbsp;<button class='delete' id='" + id.html() + "'>Delete</button>");
@@ -108,7 +108,7 @@
 				
 				var id = parent.children("td:nth-child(1)");
 				var idproducto = parent.children("td:nth-child(2)");
-				var idempleado = parent.children("td:nth-child(3)");
+				var nombre = parent.children("td:nth-child(3)");
 				var descripcion = parent.children("td:nth-child(4)");
 				var precio = parent.children("td:nth-child(5)");
 				var buttons = parent.children("td:nth-child(6)");
@@ -118,14 +118,14 @@
 					contentType: "application/json; charset=utf-8",
 					url: "http://localhost:8088/ingreso/add",
 					headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
-					data: JSON.stringify({'idproducto' : idproducto.html(), 'idempleado' : idempleado.children("input[type=text]").val(),
+					data: JSON.stringify({'idproducto' : idproducto.html(), 'nombre' : nombre.children("input[type=text]").val(),
 					'descripcion':descripcion.children("input[type=text]").val(),
 					'precio':precio.children("input[type=text]").val()
 					}),
 					cache: false,
 					success: function() {
 						idproducto.html(idproducto.children("input[type=text]").val());
-						idempleado.html(idempleado.children("input[type=text]").val());
+						nombre.html(nombre.children("input[type=text]").val());
 						descripcion.html(descripcion.children("input[type=text]").val());
 						precio.html(precio.children("input[type=text]").val());
 						buttons.html("<button class='edit' id='" + id.html() + "'>Edit</button>&nbsp;&nbsp;<button class='delete' id='" + idproducto.html() + "'>Delete</button>");
@@ -174,7 +174,7 @@
 			<thead>
 				<tr>
 					<th>Código Producto</th>
-					<th>Código Empleado</th>
+					<th>Nombre</th>
 					<th>Descripción</th>
 					<th>Precio</th>
 					
@@ -190,8 +190,8 @@
 			<label>Código Producto</label>
 			<input type="text" id="idproducto" name="idproducto">
 			<p>
-			<label>Código Empleado</label>
-			<input type="text" id="idempleado" name="idempleado">
+			<label>Nombre</label>
+			<input type="text" id="nombre" name="nombre">
 			<p>
 			<label>Descripción</label>
 			<input type="text" id="descripcion" name="descripcion">
