@@ -1,6 +1,9 @@
 server:
   port: 8088
 
+auth0:
+  audience: https://tiendasplus/api
+
 spring:
   application:
     name: tiendasplus
@@ -10,6 +13,11 @@ spring:
     username: postgres
     password: 1234
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://dev-h5l34moo.us.auth0.com/
   jpa:
     open-in-view: false
     properties:

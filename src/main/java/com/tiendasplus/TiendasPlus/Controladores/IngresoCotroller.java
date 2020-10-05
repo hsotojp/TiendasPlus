@@ -5,6 +5,7 @@ import com.tiendasplus.TiendasPlus.Repositorios.IIngresoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -21,6 +22,7 @@ public class IngresoCotroller {
 
     @PostMapping("/add")
     public String addIngreso(@RequestBody Ingreso newIngreso){
+        newIngreso.setFecha(new Date() );
         ingreso.save(newIngreso);
        
         return "Guardado correctamente";
