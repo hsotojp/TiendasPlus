@@ -27,7 +27,7 @@
 						tr.push('<td>' + json[i].idproducto + '</td>');
 						tr.push('<td>' + json[i].idempleado + '</td>');
 						
-						tr.push('<td><button class=\'edit\'>Edit</button>&nbsp;&nbsp;<button class=\'delete\' id=' + json[i].idregistro + ' >Delete</button></td>');
+						tr.push('<td><button class=\'edit\'>Edit</button>&nbsp;&nbsp;<button class=\'delete\' id=' + json[i].idingreso + ' >Delete</button></td>');
 						tr.push('</tr>');
 					}
 					$('table').append($(tr.join('')));
@@ -62,8 +62,8 @@
 			$(document).delegate('#addNew', 'click', function(event) {
 				event.preventDefault();
 				
-				var idempleado = $('#idempleado').val();
-				var idproducto = $('#idproducto').val();
+				var idempleado = $('#empleado').val();
+				var idproducto = $('#producto').val();
 				var cantidad = $('#cantidad').val();
 				
 					
@@ -119,7 +119,7 @@
 					cache: false,
 					success: function() {
 						cantidad.html(cantidad.children("input[type=text]").val());
-						idproducto.html(producto.children("input[type=text]").val());
+						producto.html(producto.children("input[type=text]").val());
 						idempleado.html(idempleado.children("input[type=text]").val());
 						buttons.html("<button class='edit' id='" + id.html() + "'>Edit</button>&nbsp;&nbsp;<button class='delete' id='" + id.html() + "'>Delete</button>");
 					},
