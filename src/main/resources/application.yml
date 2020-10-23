@@ -9,9 +9,9 @@ spring:
     name: tiendasplus
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/dbtiendasplus
-    username: postgres
-    password: 1234
+    url: jdbc:postgresql://postgresql-14282-0.cloudclusters.net:14282/tiendaplus
+    username: admin 
+    password: admin123
 
   security:
     oauth2:
