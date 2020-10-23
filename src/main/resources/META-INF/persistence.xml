@@ -7,6 +7,11 @@
     <class>com.tiendasplus.TiendasPlus.Entidades.Inventario</class>
     <class>com.tiendasplus.TiendasPlus.Entidades.Empleado</class>
     <class>com.tiendasplus.TiendasPlus.Entidades.Ingreso</class>
+    <class>com.tiendasplus.TiendasPlus.Entidades.Receta</class>
+    <class>com.tiendasplus.TiendasPlus.Entidades.Cliente</class>
+    <class>com.tiendasplus.TiendasPlus.Entidades.Venta</class>
+    <class>com.tiendasplus.TiendasPlus.Entidades.DetalleVenta</class>
+    <class>com.tiendasplus.TiendasPlus.Entidades.DetalleReceta</class>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/dbtiendasplus"/>
       <property name="javax.persistence.jdbc.user" value="postgres"/>
