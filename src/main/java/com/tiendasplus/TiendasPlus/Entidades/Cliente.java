@@ -26,10 +26,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Table(name = "cliente")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Cliente.findAll", query = "SELECT c FROM Cliente c")
-    , @NamedQuery(name = "Cliente.findByIdcliente", query = "SELECT c FROM Cliente c WHERE c.idcliente = :idcliente")
-    , @NamedQuery(name = "Cliente.findByNit", query = "SELECT c FROM Cliente c WHERE c.nit = :nit")
-    , @NamedQuery(name = "Cliente.findByNombre", query = "SELECT c FROM Cliente c WHERE c.nombre = :nombre")})
+    @NamedQuery(name = "ClienteController.findAll", query = "SELECT c FROM ClienteController c")
+    , @NamedQuery(name = "ClienteController.findByIdcliente", query = "SELECT c FROM ClienteController c WHERE c.idcliente = :idcliente")
+    , @NamedQuery(name = "ClienteController.findByNit", query = "SELECT c FROM ClienteController c WHERE c.nit = :nit")
+    , @NamedQuery(name = "ClienteController.findByNombre", query = "SELECT c FROM ClienteController c WHERE c.nombre = :nombre")})
 public class Cliente implements Serializable {
 
     private static final long serialVersionUID = 1L;
