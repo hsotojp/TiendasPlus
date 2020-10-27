@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package model;
+package com.tiendasplus.TiendasPlus.Entidades;
 
 import java.io.Serializable;
 import javax.persistence.Basic;
@@ -19,7 +19,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
- * @author hmsotoj
+ * @author gerar
  */
 @Entity
 @Table(name = "detalle_receta")
@@ -106,7 +106,7 @@ public class DetalleReceta implements Serializable {
 
     @Override
     public String toString() {
-        return "model.DetalleReceta[ idregistro=" + idregistro + " ]";
+        return "com.tiendasplus.TiendasPlus.Entidades.DetalleReceta[ idregistro=" + idregistro + " ]";
     }
     
 }

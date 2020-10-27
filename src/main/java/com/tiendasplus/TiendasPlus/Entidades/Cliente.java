@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package model;
+package com.tiendasplus.TiendasPlus.Entidades;
 
 import java.io.Serializable;
 import javax.persistence.Basic;
@@ -20,7 +20,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
- * @author hmsotoj
+ * @author gerar
  */
 @Entity
 @Table(name = "cliente")
@@ -98,7 +98,7 @@ public class Cliente implements Serializable {
 
     @Override
     public String toString() {
-        return "model.Cliente[ idcliente=" + idcliente + " ]";
+        return "com.tiendasplus.TiendasPlus.Entidades.Cliente[ idcliente=" + idcliente + " ]";
     }
     
 }

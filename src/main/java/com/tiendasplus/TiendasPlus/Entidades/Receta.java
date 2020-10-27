@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package model;
+package com.tiendasplus.TiendasPlus.Entidades;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
- * @author hmsotoj
+ * @author gerar
  */
 @Entity
 @Table(name = "receta")
@@ -111,7 +111,7 @@ public class Receta implements Serializable {
 
     @Override
     public String toString() {
-        return "model.Receta[ idreceta=" + idreceta + " ]";
+        return "com.tiendasplus.TiendasPlus.Entidades.Receta[ idreceta=" + idreceta + " ]";
     }
     
 }
