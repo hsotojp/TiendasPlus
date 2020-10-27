@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<link rel="stylesheet" href="index_style.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+	<!-- jQuery Modal -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda</title>
+    <script>
+		/*FUNCION PARA LISTAR TODOS LOS ELEMENTOS DE LA TABLA*/
+		$(document).ready(function() {
+		
+			$.ajax({
+				method: "GET",
+                url: 'http://localhost:8088/tienda/all',
+				headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
+				success: function(json){
+					var tr=[];
+					for (var i = 0; i < json.length; i++) {
+						tr.push('<tr>');
+						tr.push('<td>' + json[i].idtienda + '</td>');
+						tr.push('<td>' + json[i].nombre + '</td>');
+						tr.push('<td>' + json[i].direccion + '</td>');
+						tr.push('<td>' + json[i].telefono + '</td>');
+						tr.push('<td><button class=\'edit\'>Edit</button>&nbsp;&nbsp;<button class=\'delete\' id=' + json[i].idtienda + ' >Delete</button></td>');
+						tr.push('</tr>');
+					}
+					$('table').append($(tr.join('')));
+				
+				}
+			});
+            /*FUNCION ELIMINAR*/
+            $(document).delegate('.delete', 'click', function() { 
+				if (confirm('¿Esta seguro de eliminar este registro?')) {
+					var id = $(this).attr('id');
+					var parent = $(this).parent().parent();
+					$.ajax({
+						type: "DELETE",
+						url: "http://localhost:8088/tienda/" + id,
+						headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
+						cache: false,
+						success: function() {
+							parent.fadeOut('slow', function() {
+								$(this).remove();
+							});
+							location.reload(true)
+						},
+						error: function() {
+							$('#err').html('<span style=\'color:red; font-weight: bold; font-size: 30px;\'>Error deleting record').fadeIn().fadeOut(4000, function() {
+								$(this).remove();
+							});
+						}
+					});
+				}
+			});
+			/*FUNCION PARA AGREGAR DATOS*/
+			$(document).delegate('#addNew', 'click', function(event) {
+				event.preventDefault();
+				
+				var nombre = $('#nombre').val();
+				var direccion = $('#direccion').val();
+				var telefono = $('#telefono').val();
+				
+				
+				$.ajax({
+					type: "POST",
+					contentType: "application/json; charset=utf-8",
+					url: "http://localhost:8088/tienda/add",
+					headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
+                    data: JSON.stringify({'nombre':nombre
+                                        ,'direccion':direccion
+                                        ,'telefono': telefono}),
+					cache: false,
+					success: function(result) {
+						$("#msg").html( "<span style='color: green'>Datos agregados correctamente</span>" );
+						window.setTimeout(function(){location.reload()},1000)
+					},
+					error: function(err) {
+						$("#msg").html( "<span style='color: red'>No se han guardado datos</span>" );
+					}
+				});
+			});
+			/*FUNCION PARA EDITAR*/
+			$(document).delegate('.edit', 'click', function() {
+				var parent = $(this).parent().parent();
+				
+				var id = parent.children("td:nth-child(1)");
+				var nombre = parent.children("td:nth-child(2)");
+				var direccion = parent.children("td:nth-child(3)");
+				var telefono = parent.children("td:nth-child(4)");
+				var buttons = parent.children("td:nth-child(5)");
+				
+				nombre.html("<input type='text' id='txtnombre' value='" + nombre.html() + "'/>");
+				direccion.html("<input type='text' id='txtdireccion' value='" + direccion.html() + "'/>");
+				telefono.html("<input type='text' id='txttelefono' value='" + telefono.html() + "'/>");
+				buttons.html("<button id='save'>Save</button>&nbsp;&nbsp;<button class='delete' id='" + id.html() + "'>Delete</button>");
+			});
+			$(document).delegate('#save', 'click', function() {
+				var parent = $(this).parent().parent();
+				
+				var id = parent.children("td:nth-child(1)");
+				var nombre = parent.children("td:nth-child(2)");
+				var direccion = parent.children("td:nth-child(3)");
+				var telefono = parent.children("td:nth-child(4)");				
+				var buttons = parent.children("td:nth-child(5)");
+				
+				$.ajax({
+					type: "POST",
+					contentType: "application/json; charset=utf-8",
+					url: "http://localhost:8088/tienda/add",
+					headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
+                    data: JSON.stringify({'idtienda' : id.html(), 
+                    'nombre' : nombre.children("input[type=text]").val(),
+					'direccion':direccion.children("input[type=text]").val(),
+					'telefono':telefono.children("input[type=text]").val()
+					}),
+					cache: false,
+					success: function() {
+						nombre.html(nombre.children("input[type=text]").val());
+						direccion.html(direccion.children("input[type=text]").val());
+						telefono.html(telefono.children("input[type=text]").val());
+						buttons.html("<button class='edit' id='" + id.html() + "'>Edit</button>&nbsp;&nbsp;<button class='delete' id='" + id.html() + "'>Delete</button>");
+					},
+					error: function() {
+						$('#err').html('<span style=\'color:red; font-weight: bold; font-size: 30px;\'>Error updating record').fadeIn().fadeOut(4000, function() {
+							$(this).remove();
+						});
+					}
+				});
+			});
+		});
+    </script>
+</head>
+<body>
+
+	<nav class="navbar navbar-expand-lg navbar-light bg-light">
+	  <img style="max-width: 7%;border-radius: 100%;" src="tienda_logo.jpg">
+	  <div class="collapse navbar-collapse" id="navbarNav">
+		<ul class="navbar-nav">
+		  <li class="nav-item">
+			<a class="nav-link" href="index.html" style="font-size:20px">Home</a>
+		  </li>
+		  <li class="nav-item  active">
+			<a class="nav-link" href="tienda.html" style="font-size:20px">Tiendas <span class="sr-only">(current)</span></a>
+		  </li>
+		  <li class="nav-item" >
+			<a class="nav-link" href="Empleado.html" style="font-size:20px">Empleados</a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" href="producto.html" style="font-size:20px">Productos</a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" href="inventario.html" style="font-size:20px">Inventario </a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" href="ingreso.html" style="font-size:20px">Ingresos</a>
+		  </li>
+		</ul>
+	  </div>
+	</nav>	
+	<div class="container">
+		<h2>Tienda</h2>
+		<p><a class='btn' href="#add" rel="modal:open">Ingresar datos</a></p>
+		<table class="table">
+			<thead>
+				<tr>
+				    <th>No. de tienda</th>
+					<th>Nombre</th>
+					<th>Direccion</th>
+					<th>Telefono</th>					
+				</tr>
+			</thead>
+		</table>
+	</div>
+	
+	<form id="add" action="#" class="add_form modal" style="display:none;" name="form">
+		<div id='msg'/>
+		<h3>Ingresar datos</h3>
+		
+			<label>Nombre</label>
+			<input type="text" id="nombre" name="nombre">
+			<p>
+			<label>Direccion</label>
+			<input type="text" id="direccion" name="direccion">
+			<p>
+			<label>Telefono</label>
+			<input type="text" id="telefono" name="telefono">			
+		    <p>
+			<input type="submit" id="addNew" value="Guardar">
+		</p>
+	</form>
+</body>
+</html>

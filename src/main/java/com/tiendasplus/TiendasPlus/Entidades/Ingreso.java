@@ -45,7 +45,7 @@ public class Ingreso implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date fecha;
     @Column(name = "cantidad")
-    private Integer cantidad;
+    private int cantidad;
     @Basic(optional = false)
     @NotNull
     @Column(name = "idproducto")
@@ -84,11 +84,11 @@ public class Ingreso implements Serializable {
         this.fecha = fecha;
     }
 
-    public Integer getCantidad() {
+    public int getCantidad() {
         return cantidad;
     }
 
-    public void setCantidad(Integer cantidad) {
+    public void setCantidad(int cantidad) {
         this.cantidad = cantidad;
     }
 
