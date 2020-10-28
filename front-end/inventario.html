@@ -17,7 +17,7 @@
 		
 			$.ajax({
 				method: "GET",
-                url: 'http://localhost:8088/inventario/all',
+                url: 'https://tiendasplus.herokuapp.com/inventario/all',
 				headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
 				success: function(json){
 					var tr=[];
@@ -41,7 +41,7 @@
 					var parent = $(this).parent().parent();
 					$.ajax({
 						type: "DELETE",
-						url: "http://localhost:8088/inventario/" + id,
+						url: "https://tiendasplus.herokuapp.com/inventario/" + id,
 						headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
 						cache: false,
 						success: function() {
@@ -69,7 +69,7 @@
 				$.ajax({
 					type: "POST",
 					contentType: "application/json; charset=utf-8",
-					url: "http://localhost:8088/inventario/add",
+					url: "https://tiendasplus.herokuapp.com/inventario/add",
 					headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
 					data: JSON.stringify({'cantidad':cantidad,'idproducto':producto,'idtienda':tienda}),
 					cache: false,
@@ -109,7 +109,7 @@
 				$.ajax({
 					type: "POST",
 					contentType: "application/json; charset=utf-8",
-					url: "http://localhost:8088/inventario/add",
+					url: "https://tiendasplus.herokuapp.com/inventario/add",
 					headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
 					data: JSON.stringify({'idregistro' : id.html(), 'cantidad' : cantidad.children("input[type=text]").val(),
 					'idproducto':producto.children("input[type=text]").val(),

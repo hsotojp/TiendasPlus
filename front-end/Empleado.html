@@ -17,7 +17,7 @@
 		
 			$.ajax({
 				method: "GET",
-                url: 'http://localhost:8088/empleado/all',
+                url: 'https://tiendasplus.herokuapp.com/empleado/all',
 				headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
 				success: function(json){
 					var tr=[];
@@ -42,7 +42,7 @@
 					var parent = $(this).parent().parent();
 					$.ajax({
 						type: "DELETE",
-						url: "http://localhost:8088/empleado/" + id,
+						url: "https://tiendasplus.herokuapp.com/empleado/" + id,
 						headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
 						cache: false,
 						success: function() {
@@ -72,7 +72,7 @@
 				$.ajax({
 					type: "POST",
 					contentType: "application/json; charset=utf-8",
-					url: "http://localhost:8088/empleado/add",
+					url: "https://tiendasplus.herokuapp.com/empleado/add",
 					headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
 					data: JSON.stringify({'nombre':nombre,'apellido':apellido,'idtienda':tienda, 'usuario': usuario, 'contrasenia': contrasenia}),
 					cache: false,
@@ -115,7 +115,7 @@
 				$.ajax({
 					type: "POST",
 					contentType: "application/json; charset=utf-8",
-					url: "http://localhost:8088/empleado/add",
+					url: "https://tiendasplus.herokuapp.com/empleado/add",
 					headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
 					data: JSON.stringify({'idempleado' : id.html(), 'nombre' : nombre.children("input[type=text]").val(),
 					'apellido':apellido.children("input[type=text]").val(),

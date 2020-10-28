@@ -17,7 +17,7 @@
 		
 			$.ajax({
 				method: "GET",
-                url: 'http://localhost:8088/tienda/all',
+                url: 'https://tiendasplus.herokuapp.com/tienda/all',
 				headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
 				success: function(json){
 					var tr=[];
@@ -40,8 +40,8 @@
 					var id = $(this).attr('id');
 					var parent = $(this).parent().parent();
 					$.ajax({
-						type: "DELETE",
-						url: "http://localhost:8088/tienda/" + id,
+						type: "f>AF",
+						url: "https://tiendasplus.herokuapp.com/tienda/" + id,
 						headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
 						cache: false,
 						success: function() {
@@ -70,7 +70,7 @@
 				$.ajax({
 					type: "POST",
 					contentType: "application/json; charset=utf-8",
-					url: "http://localhost:8088/tienda/add",
+					url: "https://tiendasplus.herokuapp.com/tienda/add",
 					headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
                     data: JSON.stringify({'nombre':nombre
                                         ,'direccion':direccion
@@ -112,7 +112,7 @@
 				$.ajax({
 					type: "POST",
 					contentType: "application/json; charset=utf-8",
-					url: "http://localhost:8088/tienda/add",
+					url: "https://tiendasplus.herokuapp.com/tienda/add",
 					headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
                     data: JSON.stringify({'idtienda' : id.html(), 
                     'nombre' : nombre.children("input[type=text]").val(),
