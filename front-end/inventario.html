@@ -14,19 +14,54 @@
     <script>
 		/*FUNCION PARA LISTAR TODOS LOS ELEMENTOS DE LA TABLA*/
 		$(document).ready(function() {
+			var productos = [];
+			var tiendas = [];
+			
+			$.ajax({
+				method: "GET",
+                url: 'https://tiendasplus.herokuapp.com/producto/all',
+				headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
+				async: false,
+				success: function(json){
+					var tr=[];
+					for (var i = 0; i < json.length; i++) {
+						tr.push('<option value='+json[i].idproducto+'>'+json[i].nombre+'</option>');
+						productos[json[i].idproducto] = json[i].nombre;
+					}
+					$('#producto').append($(tr.join('')));
+				
+				}
+			});
+			
+			$.ajax({
+				method: "GET",
+                url: 'https://tiendasplus.herokuapp.com/tienda/all',
+				headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
+				async: false,
+				success: function(json){
+					var tr=[];
+					for (var i = 0; i < json.length; i++) {
+						tr.push('<option value='+json[i].idtienda+'>'+json[i].nombre+'</option>');
+						tiendas[json[i].idtienda] = json[i].nombre;
+					}
+					$('#tienda').append($(tr.join('')));
+					console.log(tiendas);
+				}
+			});
 		
 			$.ajax({
 				method: "GET",
                 url: 'https://tiendasplus.herokuapp.com/inventario/all',
 				headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
+				async: false,
 				success: function(json){
 					var tr=[];
 					for (var i = 0; i < json.length; i++) {
 						tr.push('<tr>');
 						tr.push('<td>' + json[i].idregistro + '</td>');
 						tr.push('<td>' + json[i].cantidad + '</td>');
-						tr.push('<td>'+ json[i].idproducto + '</td>');
-						tr.push('<td>' + json[i].idtienda + '</td>');
+						tr.push('<td>'+ productos[json[i].idproducto] + '</td>');
+						tr.push('<td>' + tiendas[json[i].idtienda] + '</td>');
 						tr.push('<td><button class=\'edit\'>Edit</button>&nbsp;&nbsp;<button class=\'delete\' id=' + json[i].idregistro + ' >Delete</button></td>');
 						tr.push('</tr>');
 					}
@@ -69,7 +104,7 @@
 				$.ajax({
 					type: "POST",
 					contentType: "application/json; charset=utf-8",
-					url: "https://tiendasplus.herokuapp.com/inventario/add",
+					url: "https://tiendasplus.herokuapp.com/inventario/"+ id.html(),
 					headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
 					data: JSON.stringify({'cantidad':cantidad,'idproducto':producto,'idtienda':tienda}),
 					cache: false,
@@ -88,13 +123,9 @@
 				
 				var id = parent.children("td:nth-child(1)");
 				var cantidad = parent.children("td:nth-child(2)");
-				var producto = parent.children("td:nth-child(3)");
-				var tienda = parent.children("td:nth-child(4)");
 				var buttons = parent.children("td:nth-child(5)");
 				
 				cantidad.html("<input type='text' id='txtCantidad' value='" + cantidad.html() + "'/>");
-				producto.html("<input type='text' id='txtProducto' value='" + producto.html() + "'/>");
-				tienda.html("<input type='text' id='txtTienda' value='" + tienda.html() + "'/>");
 				buttons.html("<button id='save'>Save</button>&nbsp;&nbsp;<button class='delete' id='" + id.html() + "'>Delete</button>");
 			});
 			$(document).delegate('#save', 'click', function() {
@@ -102,8 +133,6 @@
 				
 				var id = parent.children("td:nth-child(1)");
 				var cantidad = parent.children("td:nth-child(2)");
-				var producto = parent.children("td:nth-child(3)");
-				var tienda = parent.children("td:nth-child(4)");
 				var buttons = parent.children("td:nth-child(5)");
 				
 				$.ajax({
@@ -111,15 +140,12 @@
 					contentType: "application/json; charset=utf-8",
 					url: "https://tiendasplus.herokuapp.com/inventario/add",
 					headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
-					data: JSON.stringify({'idregistro' : id.html(), 'cantidad' : cantidad.children("input[type=text]").val(),
-					'idproducto':producto.children("input[type=text]").val(),
-					'idtienda':tienda.children("input[type=text]").val()
+					data: JSON.stringify({'idregistro' : id.html(), 'cantidad' : cantidad.children("input[type=text]").val()
 					}),
 					cache: false,
 					success: function() {
 						cantidad.html(cantidad.children("input[type=text]").val());
-						producto.html(producto.children("input[type=text]").val());
-						tienda.html(tienda.children("input[type=text]").val());
+						
 						buttons.html("<button class='edit' id='" + id.html() + "'>Edit</button>&nbsp;&nbsp;<button class='delete' id='" + id.html() + "'>Delete</button>");
 					},
 					error: function() {
@@ -167,8 +193,8 @@
 				<tr>
 					<th>Registro</th>
 					<th>Cantidad</th>
-					<th>Id Producto</th>
-					<th>Id Tienda</th>
+					<th>Producto</th>
+					<th>Tienda</th>
 				</tr>
 			</thead>
 		</table>
@@ -181,11 +207,13 @@
 			<label>Cantidad</label>
 			<input type="text" id="cantidad" name="cantidad">
 			<p>
-			<label>Id Producto</label>
-			<input type="text" id="producto" name="producto">
+			<label>Producto</label>
+			<select id="producto">
+			</select>
 			<p>
-			<label>Id Tienda</label>
-			<input type="text" id="tienda" name="tienda">
+			<label>Tienda</label>
+			<select id="tienda">
+			</select>
 		<p>
 			<input type="submit" id="addNew" value="Guardar">
 		</p>

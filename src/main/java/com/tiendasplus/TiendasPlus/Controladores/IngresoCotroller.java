@@ -47,10 +47,10 @@ public class IngresoCotroller {
     public Ingreso updateIngreso(@PathVariable int id, @RequestBody Ingreso newIngreso){
         Ingreso t = ingreso.findById(id).orElseThrow(()-> new IllegalArgumentException( "No se encontraron registros."));
 
-        t.setFecha(newIngreso.getFecha());
+        t.setFecha(t.getFecha());
         t.setCantidad(newIngreso.getCantidad());
-        t.setIdproducto(newIngreso.getIdproducto());
-        t.setIdempleado(newIngreso.getIdempleado());
+        t.setIdproducto(t.getIdproducto());
+        t.setIdempleado(t.getIdempleado());
 
         ingreso.save(t);
 

@@ -10,61 +10,24 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ingreso</title>
+    <title>Cliente</title>
     <script>
 		/*FUNCION PARA LISTAR TODOS LOS ELEMENTOS DE LA TABLA*/
 		$(document).ready(function() {
-			var productos = [];
-			var empleados = [];
-			
+
 			$.ajax({
 				method: "GET",
-                url: 'https://tiendasplus.herokuapp.com/producto/all',
+                url: 'https://tiendasplus.herokuapp.com/cliente/all',
 				headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
-				async: false,
-				success: function(json){
-					var tr=[];
-					for (var i = 0; i < json.length; i++) {
-						tr.push('<option value='+json[i].idproducto+'>'+json[i].nombre+'</option>');
-						productos[json[i].idproducto] = json[i].nombre;
-					}
-					$('#producto').append($(tr.join('')));
-				
-				}
-			});
-			
-			$.ajax({
-				method: "GET",
-                url: 'https://tiendasplus.herokuapp.com/empleado/all',
-				headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
-				async: false,
-				success: function(json){
-					var tr=[];
-					for (var i = 0; i < json.length; i++) {
-						tr.push('<option value='+json[i].idempleado+'>'+json[i].nombre+'</option>');
-						empleados[json[i].idempleado] = json[i].nombre;
-					}
-					$('#empleado').append($(tr.join('')));
-				
-				}
-			});
-		
-			$.ajax({
-				method: "GET",
-                url: 'https://tiendasplus.herokuapp.com/ingreso/all',
-				headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
-				async: false,
 				success: function(json){
 					var tr=[];
 					for (var i = 0; i < json.length; i++) {
 						tr.push('<tr>');
-						tr.push('<td>' + json[i].idingreso + '</td>');
-						tr.push('<td>' + json[i].fecha + '</td>');
-						tr.push('<td>' + json[i].cantidad + '</td>');
-						tr.push('<td>' + productos[json[i].idproducto] + '</td>');
-						tr.push('<td>' + empleados[json[i].idempleado] + '</td>');
+						tr.push('<td>' + json[i].idcliente + '</td>');
+						tr.push('<td>' + json[i].nit + '</td>');
+						tr.push('<td>' + json[i].nombre + '</td>');
 						
-						tr.push('<td><button class=\'edit\'>Edit</button>&nbsp;&nbsp;<button class=\'delete\' id=' + json[i].idingreso + ' >Delete</button></td>');
+						tr.push('<td><button class=\'edit\'>Edit</button>&nbsp;&nbsp;<button class=\'delete\' id=' + json[i].idcliente + ' >Delete</button></td>');
 						tr.push('</tr>');
 					}
 					$('table').append($(tr.join('')));
@@ -78,7 +41,7 @@
 					var parent = $(this).parent().parent();
 					$.ajax({
 						type: "DELETE",
-						url: "https://tiendasplus.herokuapp.com/ingreso/" + id,
+						url: "https://tiendasplus.herokuapp.com/cliente/" + id,
 						headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
 						cache: false,
 						success: function() {
@@ -99,17 +62,16 @@
 			$(document).delegate('#addNew', 'click', function(event) {
 				event.preventDefault();
 				
-				var idempleado = $('#empleado').val();
-				var idproducto = $('#producto').val();
-				var cantidad = $('#cantidad').val();
+				var nombre = $('#nombre').val();
+				var nit = $('#nit').val();
 				
 					
 				$.ajax({
 					type: "POST",
 					contentType: "application/json; charset=utf-8",
-					url: "https://tiendasplus.herokuapp.com/ingreso/add",
+					url: "https://tiendasplus.herokuapp.com/cliente/add",
 					headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
-					data: JSON.stringify({'cantidad':cantidad,'idproducto':idproducto,'idempleado':idempleado}),
+					data: JSON.stringify({'nombre':nombre,'nit':nit}),
 					cache: false,
 					success: function(result) {
 						$("#msg").html( "<span style='color: green'>Datos agregados correctamente</span>" );
@@ -125,10 +87,12 @@
 				var parent = $(this).parent().parent();
 				
 				var id = parent.children("td:nth-child(1)");
-				var cantidad = parent.children("td:nth-child(3)");
-				var buttons = parent.children("td:nth-child(6)");
+				var nit = parent.children("td:nth-child(2)");
+				var nombre = parent.children("td:nth-child(3)");
+				var buttons = parent.children("td:nth-child(4)");
 				
-				cantidad.html("<input type='text' id='txtCantidad' value='" + cantidad.html() + "'/>");
+				nit.html("<input type='text' id='txtNit' value='" + nit.html() + "'/>");
+				nombre.html("<input type='text' id='txtNombre' value='" + nombre.html() + "'/>");
 				
 				buttons.html("<button id='save'>Save</button>&nbsp;&nbsp;<button class='delete' id='" + id.html() + "'>Delete</button>");
 			});
@@ -136,28 +100,37 @@
 				var parent = $(this).parent().parent();
 				
 				var id = parent.children("td:nth-child(1)");
-				var cantidad = parent.children("td:nth-child(3)");
+				var nit = parent.children("td:nth-child(2)");
+				var nombre = parent.children("td:nth-child(3)");
 				
-				var buttons = parent.children("td:nth-child(6)");
+				var buttons = parent.children("td:nth-child(4)");
 				
 				$.ajax({
 					type: "POST",
 					contentType: "application/json; charset=utf-8",
-					url: "https://tiendasplus.herokuapp.com/ingreso/"+ id.html(),
+					url: "https://tiendasplus.herokuapp.com/cliente/"+ id.html(),
 					headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
-					data: JSON.stringify({'idingreso' : id.html(), 'cantidad' : cantidad.children("input[type=text]").val(),
-					
+					data: JSON.stringify({'idcliente' : id.html(), 'nombre' : nombre.children("input[type=text]").val(),
+					'nit' : nit.children("input[type=text]").val(),
 					}),
 					cache: false,
 					success: function() {
-						cantidad.html(cantidad.children("input[type=text]").val());
+						nit.html(nit.children("input[type=text]").val());
+						nombre.html(nombre.children("input[type=text]").val());
 						
 						buttons.html("<button class='edit' id='" + id.html() + "'>Edit</button>&nbsp;&nbsp;<button class='delete' id='" + id.html() + "'>Delete</button>");
 					},
-					error: function() {
-						$('#err').html('<span style=\'color:red; font-weight: bold; font-size: 30px;\'>Error updating record').fadeIn().fadeOut(4000, function() {
-							$(this).remove();
-						});
+					error: function(jqXHR, exception) {
+						if (jqXHR.status === 200) {
+							nit.html(nit.children("input[type=text]").val());
+							nombre.html(nombre.children("input[type=text]").val());
+							
+							buttons.html("<button class='edit' id='" + id.html() + "'>Edit</button>&nbsp;&nbsp;<button class='delete' id='" + id.html() + "'>Delete</button>");
+						} else {
+								$('#err').html('<span style=\'color:red; font-weight: bold; font-size: 30px;\'>Error updating record').fadeIn().fadeOut(4000, function() {
+								$(this).remove();
+							});
+						}
 					}
 				});
 			});
@@ -184,23 +157,24 @@
 		  <li class="nav-item">
 			<a class="nav-link" href="inventario.html" style="font-size:20px">Inventario </a>
 		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" href="ingreso.html" style="font-size:20px">Ingresos </a>
+		  </li>
 		  <li class="nav-item active">
-			<a class="nav-link" href="ingreso.html" style="font-size:20px">Ingresos <span class="sr-only">(current)</span></a>
+			<a class="nav-link" href="cliente.html" style="font-size:20px">Clientes <span class="sr-only">(current)</span></a>
 		  </li>
 		</ul>
 	  </div>
 	</nav>	
 	<div class="container">
-		<h2>Ingreso</h2>
+		<h2>Cliente</h2>
 		<p><a class='btn' href="#add" rel="modal:open">Ingresar datos</a></p>
 		<table class="table">
 			<thead>
 				<tr>
-					<th>Ingreso</th>
-					<th>Fecha</th>
-					<th>Cantidad</th>
-					<th>Producto</th>
-					<th>Empleado</th>
+					<th>ID Cliente</th>
+					<th>NIT</th>
+					<th>Nombre</th>
 				</tr>
 			</thead>
 		</table>
@@ -210,16 +184,12 @@
 		<div id='msg'/>
 		<h3>Ingresar datos</h3>
 		
-			<label>Cantidad</label>
-			<input type="text" id="cantidad" name="cantidad">
+			<label>NIT</label>
+			<input type="text" id="nit" name="nit">
 			<p>
-			<label>Producto</label>
-			<select id="producto">
-			</select>
+			<label>Nombre</label>
+			<input type="text" id="nombre" name="nombre">
 			<p>
-			<label>Empleado</label>
-			<select id="empleado">
-			</select>
 		<p>
 			<input type="submit" id="addNew" value="Guardar">
 		</p>

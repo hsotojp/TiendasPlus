@@ -44,8 +44,8 @@ public class DetalleRecetaController {
 	public DetalleReceta updateDReceta(@PathVariable int id, @RequestBody DetalleReceta newdReceta) {
 		DetalleReceta dt = idetalle.findById(id).orElseThrow(()-> new IllegalArgumentException("No se encontraron registros."));
 		
-		dt.setIdreceta(newdReceta.getIdreceta());
-		dt.setIdproducto(newdReceta.getIdproducto());
+		dt.setIdreceta(dt.getIdreceta());
+		dt.setIdproducto(dt.getIdproducto());
 		dt.setCantidad(newdReceta.getCantidad());
 		
 		idetalle.save(dt);

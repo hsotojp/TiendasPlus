@@ -40,7 +40,7 @@
 					var id = $(this).attr('id');
 					var parent = $(this).parent().parent();
 					$.ajax({
-						type: "f>AF",
+						type: "DELETE",
 						url: "https://tiendasplus.herokuapp.com/tienda/" + id,
 						headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
 						cache: false,
@@ -50,10 +50,17 @@
 							});
 							location.reload(true)
 						},
-						error: function() {
-							$('#err').html('<span style=\'color:red; font-weight: bold; font-size: 30px;\'>Error deleting record').fadeIn().fadeOut(4000, function() {
-								$(this).remove();
-							});
+						error: function(jqXHR, exception) {
+							if (jqXHR.status === 200) {
+								parent.fadeOut('slow', function() {
+									$(this).remove();
+								});
+								location.reload(true)
+							} else {
+								$('#err').html('<span style=\'color:red; font-weight: bold; font-size: 30px;\'>Error deleting record').fadeIn().fadeOut(4000, function() {
+									$(this).remove();
+								});
+							}
 						}
 					});
 				}
@@ -80,8 +87,13 @@
 						$("#msg").html( "<span style='color: green'>Datos agregados correctamente</span>" );
 						window.setTimeout(function(){location.reload()},1000)
 					},
-					error: function(err) {
-						$("#msg").html( "<span style='color: red'>No se han guardado datos</span>" );
+					error: function(jqXHR, exception) {
+						if (jqXHR.status === 200) {
+							$("#msg").html( "<span style='color: green'>Datos agregados correctamente</span>" );
+							window.setTimeout(function(){location.reload()},1000)
+						}else {
+							$("#msg").html( "<span style='color: red'>No se han guardado datos</span>" );
+						}
 					}
 				});
 			});
@@ -112,7 +124,7 @@
 				$.ajax({
 					type: "POST",
 					contentType: "application/json; charset=utf-8",
-					url: "https://tiendasplus.herokuapp.com/tienda/add",
+					url: "https://tiendasplus.herokuapp.com/tienda/" + id.html(),
 					headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
                     data: JSON.stringify({'idtienda' : id.html(), 
                     'nombre' : nombre.children("input[type=text]").val(),
@@ -126,10 +138,18 @@
 						telefono.html(telefono.children("input[type=text]").val());
 						buttons.html("<button class='edit' id='" + id.html() + "'>Edit</button>&nbsp;&nbsp;<button class='delete' id='" + id.html() + "'>Delete</button>");
 					},
-					error: function() {
-						$('#err').html('<span style=\'color:red; font-weight: bold; font-size: 30px;\'>Error updating record').fadeIn().fadeOut(4000, function() {
-							$(this).remove();
-						});
+					error: function(jqXHR, exception) {
+						if (jqXHR.status === 200) {
+							nombre.html(nombre.children("input[type=text]").val());
+							direccion.html(direccion.children("input[type=text]").val());
+							telefono.html(telefono.children("input[type=text]").val());
+							buttons.html("<button class='edit' id='" + id.html() + "'>Edit</button>&nbsp;&nbsp;<button class='delete' id='" + id.html() + "'>Delete</button>");
+						}else {
+							$('#err').html('<span style=\'color:red; font-weight: bold; font-size: 30px;\'>Error updating record').fadeIn().fadeOut(4000, function() {
+								$(this).remove();
+							});
+						}
+						
 					}
 				});
 			});

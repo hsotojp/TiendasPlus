@@ -10,61 +10,25 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ingreso</title>
+    <title>Receta</title>
     <script>
 		/*FUNCION PARA LISTAR TODOS LOS ELEMENTOS DE LA TABLA*/
 		$(document).ready(function() {
-			var productos = [];
-			var empleados = [];
-			
+
 			$.ajax({
 				method: "GET",
-                url: 'https://tiendasplus.herokuapp.com/producto/all',
+                url: 'https://tiendasplus.herokuapp.com/receta/all',
 				headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
-				async: false,
-				success: function(json){
-					var tr=[];
-					for (var i = 0; i < json.length; i++) {
-						tr.push('<option value='+json[i].idproducto+'>'+json[i].nombre+'</option>');
-						productos[json[i].idproducto] = json[i].nombre;
-					}
-					$('#producto').append($(tr.join('')));
-				
-				}
-			});
-			
-			$.ajax({
-				method: "GET",
-                url: 'https://tiendasplus.herokuapp.com/empleado/all',
-				headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
-				async: false,
-				success: function(json){
-					var tr=[];
-					for (var i = 0; i < json.length; i++) {
-						tr.push('<option value='+json[i].idempleado+'>'+json[i].nombre+'</option>');
-						empleados[json[i].idempleado] = json[i].nombre;
-					}
-					$('#empleado').append($(tr.join('')));
-				
-				}
-			});
-		
-			$.ajax({
-				method: "GET",
-                url: 'https://tiendasplus.herokuapp.com/ingreso/all',
-				headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
-				async: false,
 				success: function(json){
 					var tr=[];
 					for (var i = 0; i < json.length; i++) {
 						tr.push('<tr>');
-						tr.push('<td>' + json[i].idingreso + '</td>');
-						tr.push('<td>' + json[i].fecha + '</td>');
-						tr.push('<td>' + json[i].cantidad + '</td>');
-						tr.push('<td>' + productos[json[i].idproducto] + '</td>');
-						tr.push('<td>' + empleados[json[i].idempleado] + '</td>');
+						tr.push('<td>' + json[i].idreceta + '</td>');
+						tr.push('<td>' + json[i].nombre + '</td>');
+						tr.push('<td>' + json[i].descripcion + '</td>');
+						tr.push('<td>' + json[i].precio + '</td>');
 						
-						tr.push('<td><button class=\'edit\'>Edit</button>&nbsp;&nbsp;<button class=\'delete\' id=' + json[i].idingreso + ' >Delete</button></td>');
+						tr.push('<td><button class=\'edit\'>Edit</button>&nbsp;&nbsp;<button class=\'delete\' id=' + json[i].idreceta + ' >Delete</button></td>');
 						tr.push('</tr>');
 					}
 					$('table').append($(tr.join('')));
@@ -78,7 +42,7 @@
 					var parent = $(this).parent().parent();
 					$.ajax({
 						type: "DELETE",
-						url: "https://tiendasplus.herokuapp.com/ingreso/" + id,
+						url: "https://tiendasplus.herokuapp.com/receta/" + id,
 						headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
 						cache: false,
 						success: function() {
@@ -99,17 +63,17 @@
 			$(document).delegate('#addNew', 'click', function(event) {
 				event.preventDefault();
 				
-				var idempleado = $('#empleado').val();
-				var idproducto = $('#producto').val();
-				var cantidad = $('#cantidad').val();
+				var nombre = $('#nombre').val();
+				var desc = $('#desc').val();
+				var precio = $('#precio').val();
 				
 					
 				$.ajax({
 					type: "POST",
 					contentType: "application/json; charset=utf-8",
-					url: "https://tiendasplus.herokuapp.com/ingreso/add",
+					url: "https://tiendasplus.herokuapp.com/receta/add",
 					headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
-					data: JSON.stringify({'cantidad':cantidad,'idproducto':idproducto,'idempleado':idempleado}),
+					data: JSON.stringify({'nombre':nombre,'descripcion':desc, 'precio': precio}),
 					cache: false,
 					success: function(result) {
 						$("#msg").html( "<span style='color: green'>Datos agregados correctamente</span>" );
@@ -125,10 +89,14 @@
 				var parent = $(this).parent().parent();
 				
 				var id = parent.children("td:nth-child(1)");
-				var cantidad = parent.children("td:nth-child(3)");
-				var buttons = parent.children("td:nth-child(6)");
+				var nombre = parent.children("td:nth-child(2)");
+				var descripcion = parent.children("td:nth-child(3)");
+				var precio = parent.children("td:nth-child(4)");
+				var buttons = parent.children("td:nth-child(5)");
 				
-				cantidad.html("<input type='text' id='txtCantidad' value='" + cantidad.html() + "'/>");
+				nombre.html("<input type='text' id='txtNombre' value='" + nombre.html() + "'/>");
+				descripcion.html("<input type='text' id='txtdescripcion' value='" + descripcion.html() + "'/>");
+				precio.html("<input type='text' id='txtPrecio' value='" + precio.html() + "'/>");
 				
 				buttons.html("<button id='save'>Save</button>&nbsp;&nbsp;<button class='delete' id='" + id.html() + "'>Delete</button>");
 			});
@@ -136,28 +104,40 @@
 				var parent = $(this).parent().parent();
 				
 				var id = parent.children("td:nth-child(1)");
-				var cantidad = parent.children("td:nth-child(3)");
-				
-				var buttons = parent.children("td:nth-child(6)");
+				var nombre = parent.children("td:nth-child(2)");
+				var descripcion = parent.children("td:nth-child(3)");
+				var precio = parent.children("td:nth-child(4)");
+				var buttons = parent.children("td:nth-child(5)");
 				
 				$.ajax({
 					type: "POST",
 					contentType: "application/json; charset=utf-8",
-					url: "https://tiendasplus.herokuapp.com/ingreso/"+ id.html(),
+					url: "https://tiendasplus.herokuapp.com/receta/"+ id.html(),
 					headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
-					data: JSON.stringify({'idingreso' : id.html(), 'cantidad' : cantidad.children("input[type=text]").val(),
-					
+					data: JSON.stringify({'idreceta' : id.html(), 'nombre' : nombre.children("input[type=text]").val(),
+					'descripcion' : descripcion.children("input[type=text]").val(),
+					'precio' : precio.children("input[type=text]").val(),
 					}),
 					cache: false,
 					success: function() {
-						cantidad.html(cantidad.children("input[type=text]").val());
+						nombre.html(nombre.children("input[type=text]").val());
+						descripcion.html(descripcion.children("input[type=text]").val());
+						precio.html(precio.children("input[type=text]").val());
 						
 						buttons.html("<button class='edit' id='" + id.html() + "'>Edit</button>&nbsp;&nbsp;<button class='delete' id='" + id.html() + "'>Delete</button>");
 					},
-					error: function() {
-						$('#err').html('<span style=\'color:red; font-weight: bold; font-size: 30px;\'>Error updating record').fadeIn().fadeOut(4000, function() {
-							$(this).remove();
-						});
+					error: function(jqXHR, exception) {
+						if (jqXHR.status === 200) {
+							nombre.html(nombre.children("input[type=text]").val());
+							descripcion.html(descripcion.children("input[type=text]").val());
+							precio.html(precio.children("input[type=text]").val());
+							
+							buttons.html("<button class='edit' id='" + id.html() + "'>Edit</button>&nbsp;&nbsp;<button class='delete' id='" + id.html() + "'>Delete</button>");
+						} else {
+								$('#err').html('<span style=\'color:red; font-weight: bold; font-size: 30px;\'>Error updating record').fadeIn().fadeOut(4000, function() {
+								$(this).remove();
+							});
+						}
 					}
 				});
 			});
@@ -184,23 +164,32 @@
 		  <li class="nav-item">
 			<a class="nav-link" href="inventario.html" style="font-size:20px">Inventario </a>
 		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" href="ingreso.html" style="font-size:20px">Ingresos </a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" href="cliente.html" style="font-size:20px">Clientes </a>
+		  </li>
 		  <li class="nav-item active">
-			<a class="nav-link" href="ingreso.html" style="font-size:20px">Ingresos <span class="sr-only">(current)</span></a>
+			<a class="nav-link" href="receta.html" style="font-size:20px">Recetas <span class="sr-only">(current)</span></a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" href="venta.html" style="font-size:20px">Ventas </a>
 		  </li>
 		</ul>
 	  </div>
 	</nav>	
 	<div class="container">
-		<h2>Ingreso</h2>
+		<h2>Receta</h2>
 		<p><a class='btn' href="#add" rel="modal:open">Ingresar datos</a></p>
+		<p><a class='btn' href="detallereceta.html">Detalle Recetas</a></p>
 		<table class="table">
 			<thead>
 				<tr>
-					<th>Ingreso</th>
-					<th>Fecha</th>
-					<th>Cantidad</th>
-					<th>Producto</th>
-					<th>Empleado</th>
+					<th>No. Receta</th>
+					<th>Nombre</th>
+					<th>Descripcion</th>
+					<th>Precio en GTQ</th>
 				</tr>
 			</thead>
 		</table>
@@ -210,16 +199,16 @@
 		<div id='msg'/>
 		<h3>Ingresar datos</h3>
 		
-			<label>Cantidad</label>
-			<input type="text" id="cantidad" name="cantidad">
+			
+			<label>Nombre</label>
+			<input type="text" id="nombre" name="nombre">
 			<p>
-			<label>Producto</label>
-			<select id="producto">
-			</select>
+			<label>Descripcion</label>
+			<input type="text" id="desc" name="desc">
 			<p>
-			<label>Empleado</label>
-			<select id="empleado">
-			</select>
+			<label>Precio en GTQ</label>
+			<input type="text" id="precio" name="precio">
+			<p>
 		<p>
 			<input type="submit" id="addNew" value="Guardar">
 		</p>

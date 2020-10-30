@@ -1,5 +1,6 @@
 package com.tiendasplus.TiendasPlus.Controladores;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,7 @@ public class VentaController {
 	
 	@PostMapping("/add")
 	public String addVenta(@RequestBody Venta venta) {
+		venta.setFecha(new Date() );
 		iventa.save(venta);
 		return "Guardado correctamente";
 	}
@@ -47,8 +49,8 @@ public class VentaController {
 		
 		v.setFecha(newVenta.getFecha());
 		v.setTotal(newVenta.getTotal());
-		v.setIdcliente(newVenta.getIdcliente());
-		v.setIdtienda(newVenta.getIdtienda());
+		v.setIdcliente(v.getIdcliente());
+		v.setIdtienda(v.getIdtienda());
 		
 		iventa.save(v);
 		return v;

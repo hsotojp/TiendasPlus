@@ -13,12 +13,32 @@
     <title>Empleado</title>
     <script>
 		/*FUNCION PARA LISTAR TODOS LOS ELEMENTOS DE LA TABLA*/
+		var tiendas = [];
 		$(document).ready(function() {
+		
+		
+		
+			$.ajax({
+				method: "GET",
+                url: 'https://tiendasplus.herokuapp.com/tienda/all',
+				headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
+				async: false,
+				success: function(json){
+					var tr=[];
+					for (var i = 0; i < json.length; i++) {
+						tr.push('<option value='+json[i].idtienda+'>'+json[i].nombre+'</option>');
+						tiendas[json[i].idtienda] = json[i].nombre;
+					}
+					$('#tienda').append($(tr.join('')));
+					console.log(tiendas);
+				}
+			});
 		
 			$.ajax({
 				method: "GET",
                 url: 'https://tiendasplus.herokuapp.com/empleado/all',
 				headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
+				async: false,
 				success: function(json){
 					var tr=[];
 					for (var i = 0; i < json.length; i++) {
@@ -27,14 +47,20 @@
 						tr.push('<td>' + json[i].nombre + '</td>');
 						tr.push('<td>'+ json[i].apellido + '</td>');
 						tr.push('<td>' + json[i].usuario + '</td>');
-						tr.push('<td>' + json[i].idtienda + '</td>');
-						tr.push('<td><button class=\'edit\'>Edit</button>&nbsp;&nbsp;<button class=\'delete\' id=' + json[i].idregistro + ' >Delete</button></td>');
+						tr.push('<td>' + tiendas[json[i].idtienda] + '</td>');
+						tr.push('<td><button class=\'edit\'>Edit</button>&nbsp;&nbsp;<button class=\'delete\' id=' + json[i].idempleado + ' >Delete</button></td>');
 						tr.push('</tr>');
+						
+						console.log(json[i].idtienda == 6);
+						
+						
 					}
 					$('table').append($(tr.join('')));
 				
-				}
+				}				
 			});
+			
+			
             /*FUNCION ELIMINAR*/
             $(document).delegate('.delete', 'click', function() { 
 				if (confirm('¿Esta seguro de eliminar este registro?')) {
@@ -80,7 +106,9 @@
 						$("#msg").html( "<span style='color: green'>Datos agregados correctamente</span>" );
 						window.setTimeout(function(){location.reload()},1000)
 					},
-					error: function(err) {
+					error: function(jqXHR, exception) {
+						alert(jqXHR.status);
+						alert(exception);
 						$("#msg").html( "<span style='color: red'>No se han guardado datos</span>" );
 					}
 				});
@@ -93,13 +121,11 @@
 				var nombre = parent.children("td:nth-child(2)");
 				var apellido = parent.children("td:nth-child(3)");
 				var usuario = parent.children("td:nth-child(4)");
-				var tienda = parent.children("td:nth-child(5)");
 				var buttons = parent.children("td:nth-child(6)");
 				
 				nombre.html("<input type='text' id='txtnombre' value='" + nombre.html() + "'/>");
 				apellido.html("<input type='text' id='txtApellido' value='" + apellido.html() + "'/>");
 				usuario.html("<input type='text' id='txtUsuario' value='" + usuario.html() + "'/>");
-				tienda.html("<input type='text' id='txtTienda' value='" + tienda.html() + "'/>");
 				buttons.html("<button id='save'>Save</button>&nbsp;&nbsp;<button class='delete' id='" + id.html() + "'>Delete</button>");
 			});
 			$(document).delegate('#save', 'click', function() {
@@ -109,25 +135,22 @@
 				var nombre = parent.children("td:nth-child(2)");
 				var apellido = parent.children("td:nth-child(3)");
 				var usuario = parent.children("td:nth-child(4)");
-				var tienda = parent.children("td:nth-child(5)");
 				var buttons = parent.children("td:nth-child(6)");
 				
 				$.ajax({
 					type: "POST",
 					contentType: "application/json; charset=utf-8",
-					url: "https://tiendasplus.herokuapp.com/empleado/add",
+					url: "https://tiendasplus.herokuapp.com/empleado/" + id.html(),
 					headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
 					data: JSON.stringify({'idempleado' : id.html(), 'nombre' : nombre.children("input[type=text]").val(),
 					'apellido':apellido.children("input[type=text]").val(),
-					'usuario':usuario.children("input[type=text]").val(),
-					'idtienda': tienda.children("input[type=text]").val()
+					'usuario':usuario.children("input[type=text]").val()
 					}),
 					cache: false,
 					success: function() {
 						nombre.html(nombre.children("input[type=text]").val());
 						apellido.html(apellido.children("input[type=text]").val());
 						usuario.html(usuario.children("input[type=text]").val());
-						tienda.html(tienda.children("input[type=text]").val());
 						buttons.html("<button class='edit' id='" + id.html() + "'>Edit</button>&nbsp;&nbsp;<button class='delete' id='" + id.html() + "'>Delete</button>");
 					},
 					error: function() {
@@ -177,7 +200,7 @@
 					<th>Nombre</th>
 					<th>Apellido</th>
 					<th>Usuario</th>
-					<th>Id Tienda</th>
+					<th>Tienda</th>
 				</tr>
 			</thead>
 		</table>
@@ -193,8 +216,9 @@
 			<label>Apellido</label>
 			<input type="text" id="apellido" name="apellido">
 			<p>
-			<label>Id Tienda</label>
-			<input type="text" id="tienda" name="tienda">
+			<label>Tienda</label>
+			<select id="tienda">
+			</select>
 			<p>
 			<label>Usuario</label>
 			<input type="text" id="usuario" name="usuario">

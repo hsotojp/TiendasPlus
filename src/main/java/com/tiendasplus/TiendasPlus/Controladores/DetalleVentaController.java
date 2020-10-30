@@ -44,11 +44,11 @@ public class DetalleVentaController {
 	public DetalleVenta updateDVenta(@PathVariable int id, @RequestBody DetalleVenta newdVenta) {
 		DetalleVenta dv = idVenta.findById(id).orElseThrow(()-> new IllegalArgumentException("No se encontraron registros."));
 		
-		dv.setIdventa(newdVenta.getIdventa());
-		dv.setPosicion(newdVenta.getPosicion());
+		dv.setIdventa(dv.getIdventa());
+		dv.setPosicion(dv.getPosicion());
 		dv.setCantidad(newdVenta.getCantidad());
-		dv.setIdproducto(newdVenta.getIdproducto());
-		dv.setIdreceta(newdVenta.getIdreceta());
+		dv.setIdproducto(dv.getIdproducto());
+		dv.setIdreceta(dv.getIdreceta());
 		dv.setTotal(newdVenta.getTotal());
 		
 		idVenta.save(dv);

@@ -64,7 +64,6 @@
 				event.preventDefault();
 				
 				
-				var idproducto = $('#idproducto').val();
 				var nombre = $('#nombre').val();
 				var descripcion = $('#descripcion').val();
 				var precio = $('#precio').val();
@@ -73,15 +72,16 @@
 				$.ajax({
 					type: "POST",
 					contentType: "application/json; charset=utf-8",
-					url: "https://tiendasplus.herokuapp.com/ingreso/add",
+					url: "https://tiendasplus.herokuapp.com/producto/add",
 					headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
-					data: JSON.stringify({'precio':precio,'idproducto':idproducto,'nombre':nombre,'descripcion':descripcion}),
+					data: JSON.stringify({'precio':precio,'nombre':nombre,'descripcion':descripcion}),
 					cache: false,
 					success: function(result) {
 						$("#msg").html( "<span style='color: green'>Datos agregados correctamente</span>" );
 						window.setTimeout(function(){location.reload()},1000)
 					},
-					error: function(err) {
+					error: function(jqXHR, exception) {
+						alert(jqXHR);
 						$("#msg").html( "<span style='color: red'>No se han guardado datos</span>" );
 					}
 				});
@@ -91,14 +91,12 @@
 				var parent = $(this).parent().parent();
 				
 				var id = parent.children("td:nth-child(1)");
-				var idproducto = parent.children("td:nth-child(2)");
-				var nombre = parent.children("td:nth-child(3)");
-				var descripcion = parent.children("td:nth-child(4)");
-				var precio = parent.children("td:nth-child(5)");
-				var buttons = parent.children("td:nth-child(6)");
+				var nombre = parent.children("td:nth-child(2)");
+				var descripcion = parent.children("td:nth-child(3)");
+				var precio = parent.children("td:nth-child(4)");
+				var buttons = parent.children("td:nth-child(5)");
 				
-				idproducto.html("<input type='text' id='txtProducto' value='" + idproducto.html() + "'/>");
-				nombre.html("<input type='text' id='txtEmpleado' value='" + nombre.html() + "'/>");
+				nombre.html("<input type='text' id='txtNombre' value='" + nombre.html() + "'/>");
 				descripcion.html("<input type='text' id='txtDescripcion' value='" + descripcion.html() + "'/>");
 				precio.html("<input type='text' id='txtPrecio' value='" + precio.html() + "'/>");
 				buttons.html("<button id='save'>Save</button>&nbsp;&nbsp;<button class='delete' id='" + id.html() + "'>Delete</button>");
@@ -107,28 +105,26 @@
 				var parent = $(this).parent().parent();
 				
 				var id = parent.children("td:nth-child(1)");
-				var idproducto = parent.children("td:nth-child(2)");
-				var nombre = parent.children("td:nth-child(3)");
-				var descripcion = parent.children("td:nth-child(4)");
-				var precio = parent.children("td:nth-child(5)");
-				var buttons = parent.children("td:nth-child(6)");
+				var nombre = parent.children("td:nth-child(2)");
+				var descripcion = parent.children("td:nth-child(3)");
+				var precio = parent.children("td:nth-child(4)");
+				var buttons = parent.children("td:nth-child(5)");
 				
 				$.ajax({
 					type: "POST",
 					contentType: "application/json; charset=utf-8",
-					url: "https://tiendasplus.herokuapp.com/ingreso/add",
+					url: "https://tiendasplus.herokuapp.com/ingreso/"+ id.html(),
 					headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
-					data: JSON.stringify({'idproducto' : idproducto.html(), 'nombre' : nombre.children("input[type=text]").val(),
+					data: JSON.stringify({'idproducto' : id.html(), 'nombre' : nombre.children("input[type=text]").val(),
 					'descripcion':descripcion.children("input[type=text]").val(),
 					'precio':precio.children("input[type=text]").val()
 					}),
 					cache: false,
 					success: function() {
-						idproducto.html(idproducto.children("input[type=text]").val());
 						nombre.html(nombre.children("input[type=text]").val());
 						descripcion.html(descripcion.children("input[type=text]").val());
 						precio.html(precio.children("input[type=text]").val());
-						buttons.html("<button class='edit' id='" + id.html() + "'>Edit</button>&nbsp;&nbsp;<button class='delete' id='" + idproducto.html() + "'>Delete</button>");
+						buttons.html("<button class='edit' id='" + id.html() + "'>Edit</button>&nbsp;&nbsp;<button class='delete' id='" + id.html() + "'>Delete</button>");
 					},
 					error: function() {
 						$('#err').html('<span style=\'color:red; font-weight: bold; font-size: 30px;\'>Error updating record').fadeIn().fadeOut(4000, function() {
@@ -187,8 +183,6 @@
 		<div id='msg'/>
 		<h3>Ingresar datos</h3>
 		
-			<label>Código Producto</label>
-			<input type="text" id="idproducto" name="idproducto">
 			<p>
 			<label>Nombre</label>
 			<input type="text" id="nombre" name="nombre">
