@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<link rel="stylesheet" href="index_style.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+	<!-- jQuery Modal -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle Venta</title>
+    <script>
+		/*FUNCION PARA LISTAR TODOS LOS ELEMENTOS DE LA TABLA*/
+		$(document).ready(function() {
+			var productos = [];
+			var precio = [];
+			var precio_r = [];
+			var recetas = [];
+			var ventas = [];
+			
+			$.ajax({
+				method: "GET",
+                url: 'https://tiendasplus.herokuapp.com/producto/all',
+				headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
+				async: false,
+				success: function(json){
+					var tr=[];
+					for (var i = 0; i < json.length; i++) {
+						tr.push('<option value='+json[i].idproducto+'>'+json[i].nombre+'</option>');
+						productos[json[i].idproducto] = json[i].nombre;
+						precio[json[i].idproducto] = json[i].precio;
+					}
+					$('#registro').append($(tr.join('')));
+				
+				}
+			});
+			
+			$.ajax({
+				method: "GET",
+                url: 'https://tiendasplus.herokuapp.com/venta/all',
+				headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
+				async: false,
+				success: function(json){
+					var tr=[];
+					for (var i = 0; i < json.length; i++) {
+						tr.push('<option value='+json[i].idventa+'>'+json[i].idventa+'</option>');
+					}
+					$('#venta').append($(tr.join('')));
+				
+				}
+			});
+			
+			
+			$.ajax({
+				method: "GET",
+                url: 'https://tiendasplus.herokuapp.com/receta/all',
+				headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
+				async: false,
+				success: function(json){
+					var tr=[];
+					for (var i = 0; i < json.length; i++) {
+						tr.push('<option value='+json[i].idreceta+'>'+json[i].nombre+'</option>');
+						recetas[json[i].idreceta] = json[i].nombre;
+						precio_r[json[i].idreceta] = json[i].precio;
+					}
+				
+				}
+			});
+			
+			
+		
+			$.ajax({
+				method: "GET",
+                url: 'https://tiendasplus.herokuapp.com/detalle-venta/all',
+				headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
+				async: false,
+				success: function(json){
+					var tr=[];
+					var total = 0;
+					for (var i = 0; i < json.length; i++) {
+						total = 0;
+						tr.push('<tr>');
+						tr.push('<td>' + json[i].idregistro + '</td>');
+						tr.push('<td>' + json[i].idventa + '</td>');
+						tr.push('<td>' + json[i].cantidad + '</td>');
+											
+						if(typeof productos[json[i].idproducto] === 'undefined'){
+							tr.push('<td> N/A </td>');
+						}else{
+							tr.push('<td>' + productos[json[i].idproducto] + '</td>');
+						}
+						
+						
+						if(typeof recetas[json[i].idreceta] === 'undefined'){
+							tr.push('<td> N/A </td>');
+						}else{
+							tr.push('<td>' + recetas[json[i].idreceta] + '</td>');
+						}
+						
+						tr.push('<td>' + json[i].total + '</td>');
+						
+						
+						tr.push('</tr>');
+					}
+					$('table').append($(tr.join('')));
+				
+				}
+			});
+			
+			$('#opcion').change(function(){
+			var registro = $('#registro');
+			registro.html("");
+				if($(this).val() == 1){
+					productos.forEach(function(c, index) {
+					registro.append('<option value='+ index +'>'+ c +'</option>');
+					});
+				}else{
+					recetas.forEach(function(c, index) {
+						registro.append('<option value='+ index +'>'+ c +'</option>');
+					});
+				}
+			});
+			
+			
+			/*FUNCION PARA AGREGAR DATOS*/
+			$(document).delegate('#addNew', 'click', function(event) {
+				event.preventDefault();
+				
+				var cantidad = $('#cantidad').val();
+				var opcion = $('#opcion').val();
+				var registro = $('#registro').val();
+				var idventa = $('#venta').val();
+				
+				
+				if(opcion == 1){
+					
+					var total = cantidad * precio[registro];
+					$.ajax({
+						type: "POST",
+						contentType: "application/json; charset=utf-8",
+						url: "https://tiendasplus.herokuapp.com/detalle-venta/add",
+						headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
+						data: JSON.stringify({'cantidad':cantidad,'idventa':idventa, 'idproducto':registro, 'idreceta': 0, 'total': total}),
+						cache: false,
+						success: function(result) {
+							$("#msg").html( "<span style='color: green'>Datos agregados correctamente</span>" );
+							window.setTimeout(function(){location.reload()},1000)
+						},
+						error: function(err) {
+							$("#msg").html( "<span style='color: red'>No se han guardado datos</span>" );
+						}
+					});
+				}else{
+					
+					var total = cantidad * precio_r[registro];
+					$.ajax({
+						type: "POST",
+						contentType: "application/json; charset=utf-8",
+						url: "https://tiendasplus.herokuapp.com/detalle-venta/add",
+						headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
+						data: JSON.stringify({'cantidad':cantidad,'idventa':idventa, 'idproducto':0, 'idreceta': registro, 'total': total}),
+						cache: false,
+						success: function(result) {
+							$("#msg").html( "<span style='color: green'>Datos agregados correctamente</span>" );
+							window.setTimeout(function(){location.reload()},1000)
+						},
+						error: function(err) {
+							$("#msg").html( "<span style='color: red'>No se han guardado datos</span>" );
+						}
+					});
+				
+				}				
+					
+			});
+		});
+    </script>
+</head>
+<body>
+	<nav class="navbar navbar-expand-lg navbar-light bg-light">
+	  <img style="max-width: 7%;border-radius: 100%;" src="tienda_logo.jpg">
+	  <div class="collapse navbar-collapse" id="navbarNav">
+		<ul class="navbar-nav">
+		  <li class="nav-item">
+			<a class="nav-link" href="index.html" style="font-size:20px">Home</a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" href="Tienda.html" style="font-size:20px">Tiendas</a>
+		  </li>
+		  <li class="nav-item" >
+			<a class="nav-link" href="Empleado.html" style="font-size:20px">Empleados</a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" href="producto.html" style="font-size:20px">Productos</a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" href="inventario.html" style="font-size:20px">Inventario </a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" href="ingreso.html" style="font-size:20px">Ingresos </a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" href="cliente.html" style="font-size:20px">Clientes </a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" href="receta.html" style="font-size:20px">Recetas </a>
+		  </li>
+		  <li class="nav-item active">
+			<a class="nav-link" href="venta.html" style="font-size:20px">Ventas <span class="sr-only">(current)</span></a>
+		  </li>
+		</ul>
+	  </div>
+	</nav>	
+	<div class="container">
+		<h2>Detalle Ventas</h2>
+		<p><a class='btn' href="#add" rel="modal:open">Ingresar datos</a></p>
+		<p><a class='btn' href="venta.html">Ventas</a></p>
+		<table class="table">
+			<thead>
+				<tr>
+					<th>No. Detalle</th>
+					<th>No. Venta</th>
+					<th>Cantidad</th>
+					<th>Producto</th>
+					<th>Receta</th>
+					<th>Total en GTQ</th>
+				</tr>
+			</thead>
+		</table>
+	</div>
+	
+	<form id="add" action="#" class="add_form modal" style="display:none;" name="form">
+		<div id='msg'/>
+		<h3>Ingresar datos</h3>
+			
+			<label>No. Venta</label>
+			<select id="venta">
+			</select>
+			<p>
+			
+			<label>Cantidad</label>
+			<input type="text" id="cantidad" name="cantidad">
+			<p>
+			<p>
+			<label>¿Qué desea vender?</label>
+			<select id="opcion">
+				<option value="1" selected>Productos</option> 
+				<option value="2">Recetas</option>
+			</select>
+			<p>
+			
+			<label>Registro</label>
+			<select id="registro">
+			</select>
+		<p>
+			<input type="submit" id="addNew" value="Guardar">
+		</p>
+	</form>
+</body>
+</html>

@@ -16,6 +16,7 @@
 		$(document).ready(function() {
 			var tiendas = [];
 			var clientes = [];
+			var det_venta = [];
 			
 			$.ajax({
 				method: "GET",
@@ -35,6 +36,23 @@
 			
 			$.ajax({
 				method: "GET",
+                url: 'https://tiendasplus.herokuapp.com/detalle-venta/all',
+				headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
+				async: false,
+				success: function(json){
+					var tr=[];
+					for (var i = 0; i < json.length; i++) {
+						if (typeof det_venta[json[i].idventa] == 'undefined'){
+							det_venta[json[i].idventa] = parseInt(json[i].total, 10);
+						}else{
+							det_venta[json[i].idventa] = parseInt(det_venta[json[i].idventa], 10) + parseInt(json[i].total, 10);
+						}
+					}
+				}
+			});
+			
+			$.ajax({
+				method: "GET",
                 url: 'https://tiendasplus.herokuapp.com/cliente/all',
 				headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
 				async: false,
@@ -42,7 +60,7 @@
 					var tr=[];
 					for (var i = 0; i < json.length; i++) {
 						tr.push('<option value='+json[i].idcliente+'>'+json[i].nit+'-'+json[i].nombre+'</option>');
-						clientes[json[i].idempleado] = json[i].nombre;
+						clientes[json[i].idcliente] = json[i].nombre;
 					}
 					$('#cliente').append($(tr.join('')));
 				
@@ -58,11 +76,15 @@
 					var tr=[];
 					for (var i = 0; i < json.length; i++) {
 						tr.push('<tr>');
-						tr.push('<td>' + json[i].idingreso + '</td>');
+						tr.push('<td>' + json[i].idventa + '</td>');
 						tr.push('<td>' + json[i].fecha + '</td>');
-						tr.push('<td>' + json[i].cantidad + '</td>');
-						tr.push('<td>' + productos[json[i].idproducto] + '</td>');
-						tr.push('<td>' + empleados[json[i].idempleado] + '</td>');
+						if(typeof det_venta[json[i].idventa] == 'undefined'){
+							tr.push('<td>' + 0 + '</td>');
+						}else{
+							tr.push('<td>' + det_venta[json[i].idventa] + '</td>');
+						}
+						tr.push('<td>' + clientes[json[i].idcliente] + '</td>');
+						tr.push('<td>' + tiendas[json[i].idtienda] + '</td>');
 						
 						
 						tr.push('</tr>');
@@ -75,17 +97,16 @@
 			$(document).delegate('#addNew', 'click', function(event) {
 				event.preventDefault();
 				
-				var idempleado = $('#empleado').val();
-				var idproducto = $('#producto').val();
-				var cantidad = $('#cantidad').val();
+				var idcliente = $('#cliente').val();
+				var idtienda = $('#tienda').val();
 				
 					
 				$.ajax({
 					type: "POST",
 					contentType: "application/json; charset=utf-8",
-					url: "https://tiendasplus.herokuapp.com/ingreso/add",
+					url: "https://tiendasplus.herokuapp.com/venta/add",
 					headers: {"Authorization": "Bearer "+sessionStorage.getItem('token')},
-					data: JSON.stringify({'cantidad':cantidad,'idproducto':idproducto,'idempleado':idempleado}),
+					data: JSON.stringify({'idcliente':idcliente,'idtienda':idtienda, 'total':0}),
 					cache: false,
 					success: function(result) {
 						$("#msg").html( "<span style='color: green'>Datos agregados correctamente</span>" );
@@ -137,12 +158,13 @@
 	<div class="container">
 		<h2>Ventas</h2>
 		<p><a class='btn' href="#add" rel="modal:open">Ingresar datos</a></p>
+		<p><a class='btn' href="detalleventa.html">Detalle Ventas</a></p>
 		<table class="table">
 			<thead>
 				<tr>
 					<th>No. Venta</th>
 					<th>Fecha</th>
-					<th>Total</th>
+					<th>Total en GTQ</th>
 					<th>Cliente</th>
 					<th>Tienda</th>
 				</tr>
